@@ -22,39 +22,35 @@ void draw(void) {
   my = u8g.getHeight();
   my >>= 1;
   
-  u8g.drawStr( mx, my, "Ag");
-  u8g.drawStr90( mx, my, "Ag");
-  u8g.drawStr180( mx, my, "Ag");
-  u8g.drawStr270( mx, my, "Ag");
+  u8g.drawHLine(3,5, 7);
+  u8g.drawHLine(3,6, 7);
+
+  u8g.drawHLine(68,5, u8g.getWidth() - 71);
+  u8g.drawHLine(68,6, u8g.getWidth() - 71);
+
+  u8g.setFont(keentitle);
+  u8g.drawStr( 11, 10, "MAIN MENU");
+  u8g.setFont(keen);
+
+  u8g.drawStr( 41, 20, "+NEW GAME");
+  u8g.drawStr( 41, 28, "+LOAD GAME");
+  u8g.drawStr( 41, 36, "-SAVE GAME");
+  u8g.drawStr( 41, 44, "+CONFIGURE");
+  u8g.drawStr( 41, 52, "-RETURN TO GAME");
+  u8g.drawStr( 41, 60, "+END GAME");
+  u8g.drawStr( 41, 68, "+PADDLE WAR");
+  u8g.drawStr( 41, 76, "+QUIT");
+
+
+  u8g.drawHLine(3,84, u8g.getWidth() - 6);
+  u8g.drawHLine(3,85, u8g.getWidth() - 6);
 }
 
 void setup(void) {
   u8g.setFont(keen);
 }
 
-void change_font_pos(void) {
-  static  uint8_t dir = 0;
-  static  unsigned long next = 0;
-
-  if ( next < millis() )
-  {
-    switch(dir) {
-      case 0: u8g.setFontPosBottom(); break;
-      case 1: u8g.setFontPosBaseline(); break;
-      case 2: u8g.setFontPosCenter(); break;
-      case 3: u8g.setFontPosTop(); break;
-    }
-    
-    dir++;
-    dir &= 3;
-    next = millis();
-    next += 1000;
-  }
-}
-
 void loop(void) {
-  // change the font position  
-  change_font_pos();
   
   // picture loop
   u8g.firstPage();  
