@@ -1,0 +1,111 @@
+STARTFONT 2.1
+COMMENT
+COMMENT  This font is copyrighted by its author, who reserves all rights under
+COMMENT  national and international copyright laws.
+COMMENT
+COMMENT  Produced with bdfedit, a tcl/tk font editing program
+COMMENT    written by Thomas A. Fine
+COMMENT    Email to my last name at head.cfa.harvard.edu
+COMMENT    http://hea-www.harvard.edu/~fine/
+FONT UNTITLED
+SIZE 13 72 72
+FONTBOUNDINGBOX 9 12 0 -3
+STARTPROPERTIES 11
+FOUNDRY "Fine"
+FAMILY_NAME ""
+WEIGHT_NAME "Medium"
+SLANT "R"
+SETWIDTH_NAME "Normal"
+SPACING "c"
+CHARSET_REGISTRY "ISO-8859"
+CHARSET_ENCODING "1"
+COPYRIGHT "Designer of this font retains full rights under the law"
+FONT_ASCENT  9
+FONT_DESCENT 3
+ENDPROPERTIES
+CHARS 6
+STARTCHAR C101
+ENCODING 65
+SWIDTH 538 0
+DWIDTH 7 0
+BBX 6 7 0 0
+BITMAP
+78
+cc
+cc
+cc
+fc
+cc
+cc
+ENDCHAR
+STARTCHAR C105
+ENCODING 69
+SWIDTH 461 0
+DWIDTH 6 0
+BBX 5 7 0 0
+BITMAP
+f8
+c0
+c0
+f0
+c0
+c0
+f8
+ENDCHAR
+STARTCHAR C111
+ENCODING 73
+SWIDTH 230 0
+DWIDTH 3 0
+BBX 2 7 0 0
+BITMAP
+c0
+c0
+c0
+c0
+c0
+c0
+c0
+ENDCHAR
+STARTCHAR C115
+ENCODING 77
+SWIDTH 692 0
+DWIDTH 9 0
+BBX 8 7 0 0
+BITMAP
+c3
+e7
+ff
+db
+c3
+c3
+c3
+ENDCHAR
+STARTCHAR C116
+ENCODING 78
+SWIDTH 538 0
+DWIDTH 7 0
+BBX 6 7 0 0
+BITMAP
+cc
+ec
+fc
+dc
+cc
+cc
+cc
+ENDCHAR
+STARTCHAR C125
+ENCODING 85
+SWIDTH 538 0
+DWIDTH 7 0
+BBX 6 7 0 0
+BITMAP
+cc
+cc
+cc
+cc
+cc
+cc
+78
+ENDCHAR
+ENDFONT
