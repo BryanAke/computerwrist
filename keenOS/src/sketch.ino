@@ -13,6 +13,72 @@ U8GLIB_DOGXL160_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 
 #include "fonts/keen.c"
 #include "fonts/keentitle.c"
 
+//defines for tracking keypresses
+#define KEY_NONE 0
+#define KEY_UP 1
+#define KEY_DOWN 2
+#define KEY_LEFT 3
+#define KEY_RIGHT 4
+
+uint8_t uiKeyCodeFirst = KEY_NONE;
+uint8_t uiKeyCodeSecond = KEY_NONE;
+uint8_t uiKeyCode = KEY_NONE;
+
+uint8_t last_key_code = KEY_NONE;
+
+//set up pins for buttons.
+//up/down -- flat buttons in middle of left side
+const int up_pin = 6;
+const int down_pin = 5;
+
+//left/right -- round buttons on bottom-left corner.
+const int left_pin = 7;
+const int right_pin = 8;
+
+//Main Menu - options to draw on the main menu.
+char* mainMenu_strings[]={"NEW GAME", "LOAD GAME", "SAVE GAME",
+                  "CONFIGURE", "RETURN TO GAME","END GAME", "PADDLE WAR", "QUIT"};
+int mainMenu_usability[] = {true, true, false, true, false, false, true, true};
+
+int selected = 0;
+int last = 0;
+
+int redraw_required = 0;
+
+void draw() {
+  //u8g_uint_t mx, my;
+  
+  //mx = u8g.getWidth();
+  //mx >>= 1;
+  
+  //my = u8g.getHeight();
+  //my >>= 1;
+  
+  u8g.setColorIndex(2);
+  drawHeader("MAIN MENU");
+  u8g.setColorIndex(1);
+  int i;
+  for (i=0; i< 8; i = i+1) {
+    drawMenuItem(i, mainMenu_strings[i], selected == i, mainMenu_usability[i]);
+  }
+  u8g.setColorIndex(2);
+
+  //u8g.drawHLine(3,84, u8g.getWidth() - 6);
+  u8g.drawHLine(3,85, u8g.getWidth() - 6);
+
+  u8g.setColorIndex(1);
+  
+  u8g.drawStr( 6, 93, "Arrows move      Enter selects");
+  u8g.drawStr( 51, 100, "ESC to quit");
+  u8g.setColorIndex(2);
+}
+
+/*
+ * drawHeader(title)
+ * ----
+ * will draw a header for a menu or info page on the top of the screen using the title font
+ * with a line continuing around it.
+ */
 void drawHeader(char title[]) {
   //draw lines to left of title
   //u8g.drawHLine(3,5, 7);
@@ -33,79 +99,25 @@ void drawHeader(char title[]) {
 
 }
 
-//void drawMenu(char title[], 
-char* mainMenuStrings[]={"+NEW GAME", "+LOAD GAME", "-SAVE GAME",
-                  "+CONFIGURE", "-RETURN TO GAME","-END GAME", "+PADDLE WAR", "+QUIT"};
-int selected = 0;
-int pinStatus = 0;
-int last = 0;
-
-void draw(int pinStatus) {
-  //u8g_uint_t mx, my;
-  
-  //mx = u8g.getWidth();
-  //mx >>= 1;
-  
-  //my = u8g.getHeight();
-  //my >>= 1;
-  
-  u8g.setColorIndex(2);
-  drawHeader("MAIN MENU");
-  u8g.setColorIndex(1);
-  int i;
-  for (i=0; i< 8; i = i+1) {
-    if (i == selected) {
-      //up the brightness..
-      u8g.setColorIndex(2);
-      u8g.drawStr(41, 20 + i*8, mainMenuStrings[i]);
-      u8g.setColorIndex(1);      
-    } else {
-      u8g.drawStr(41, 20 + i*8, mainMenuStrings[i]);
-    }
+void drawMenuItem(int index, char text[], boolean highlight, boolean usable) {
+  //draw the menu option with the given parameters..
+  char* icon = "+";
+  if (!usable) {
+    icon = "-";
   }
-  u8g.setColorIndex(2);
-  /*
-  u8g.drawStr( 41, 20, "+NEW GAME");
-  u8g.drawStr( 41, 28, "+LOAD GAME");
-  u8g.setColorIndex(2);
-  u8g.drawStr( 41, 36, "-SAVE GAME");
-  u8g.setColorIndex(1);
-  u8g.drawStr( 41, 44, "+CONFIGURE");
-  u8g.drawStr( 41, 52, "-RETURN TO GAME");
-  u8g.drawStr( 41, 60, "-END GAME");
-  u8g.drawStr( 41, 68, "+PADDLE WAR");
-  u8g.drawStr( 41, 76, "+QUIT");
-  u8g.setColorIndex(2);
-  */
 
-  if (pinStatus == LOW) {
-    u8g.setColorIndex(1);
-    u8g.drawStr( 15, 20, "TEST");
+  if (highlight) {
+    //up the brightness..
     u8g.setColorIndex(2);
-
+    u8g.drawStr(41, 20 + index*8, icon);
+    u8g.drawStr(46, 20 + index*8, text);
+    u8g.setColorIndex(1);      
   } else {
-
-    u8g.drawStr( 15, 20, "TEST");
-
+    u8g.drawStr(41, 20 + index*8, icon);
+    u8g.drawStr(46, 20 + index*8, text);
   }
-
-  //u8g.drawHLine(3,84, u8g.getWidth() - 6);
-  u8g.drawHLine(3,85, u8g.getWidth() - 6);
-
-  u8g.setColorIndex(1);
-  
-  u8g.drawStr( 6, 93, "Arrows move      Enter selects");
-  u8g.drawStr( 51, 100, "ESC to quit");
-  u8g.setColorIndex(2);
 }
-//set up pins for buttons.
-//up/down -- flat buttons in middle of left side
-const int up_pin = 5;
-const int down_pin = 6;
 
-//left/right -- round buttons on bottom-left corner.
-const int left_pin = 7;
-const int right_pin = 8;
 
 void setup(void) {
   //setup input pins
@@ -119,26 +131,63 @@ void setup(void) {
   //set font to default font
   u8g.setFont(keen);
   u8g.setColorIndex(2);
+  redraw_required = 1;
 }
 
 void checkInput(void) {
-  pinStatus = digitalRead(5);
-  if (pinStatus && !last) {
-    last = 1;
-    selected = (selected + 1) % 8;
-  } else if (!pinStatus && last) {
-    last = 0;
+  uiKeyCodeSecond = uiKeyCodeFirst;
+  if ( digitalRead(up_pin) == LOW )
+    uiKeyCodeFirst = KEY_UP;
+  else if ( digitalRead(down_pin) == LOW )
+    uiKeyCodeFirst = KEY_DOWN;
+  else if ( digitalRead(left_pin) == LOW )
+    uiKeyCodeFirst = KEY_LEFT;
+  else if ( digitalRead(right_pin) == LOW )
+    uiKeyCodeFirst = KEY_RIGHT;
+  else 
+    uiKeyCodeFirst = KEY_NONE;
+  
+  if ( uiKeyCodeSecond == uiKeyCodeFirst )
+    uiKeyCode = uiKeyCodeFirst;
+  else
+    uiKeyCode = KEY_NONE;
+}
+
+void processInput(void) {
+  if ( uiKeyCode != KEY_NONE && last_key_code == uiKeyCode ) {
+    return;
+  }
+  last_key_code = uiKeyCode;
+  
+  switch ( uiKeyCode ) {
+    case KEY_UP:
+      selected++;
+      if ( selected >= 8 )
+        selected = 0;
+      redraw_required = 1;
+      break;
+    case KEY_DOWN:
+      if ( selected == 0 )
+        selected = 8;
+      selected--;
+      redraw_required = 1;
+      break;
   }
 }
 
+
 void loop(void) {
   checkInput();
-  // picture loop
-  u8g.firstPage();  
-  do {
-    
-    draw(pinStatus);
-  } while( u8g.nextPage() );
+  processInput();
+  if (  redraw_required != 0 ) {
+    // picture loop
+    u8g.firstPage();  
+    do {
+      
+      draw();
+    } while( u8g.nextPage() );
+    redraw_required = 0;
+  }
   
   // rebuild the picture after some delay
   //delay(100);
