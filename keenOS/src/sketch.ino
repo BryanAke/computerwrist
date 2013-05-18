@@ -41,6 +41,7 @@ typedef struct Menu {
     char* title;
     char* options[8];
     int usable[8];
+    int back;
   } Menu;
 
 struct Menu mainMenu = {
