@@ -17,6 +17,18 @@ U8GLIB_DOGXL160_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 
 #define KEY_LEFT 3
 #define KEY_RIGHT 4
 
+//defines for mode of display
+#define MODE_NONE -1
+#define MODE_SLEEP 0
+#define MODE_MAIN 1
+#define MODE_NEWGAME 2
+#define MODE_LOADGAME 3
+#define MODE_CONFIG 4
+#define MODE_PADDLE 5
+#define MODE_QUIT 6
+
+uint8_t current_mode;
+
 uint8_t uiKeyCodeFirst = KEY_NONE;
 uint8_t uiKeyCodeSecond = KEY_NONE;
 uint8_t uiKeyCode = KEY_NONE;
@@ -41,8 +53,13 @@ typedef struct Menu {
     char* title;
     char* options[8];
     int usable[8];
-    int back;
+    int destination[8];
+    struct Menu* back;
+    int length;
+    
   } Menu;
+  
+struct Menu current_menu;
 
 struct Menu mainMenu = {
   "MAIN MENU",
@@ -55,8 +72,11 @@ struct Menu mainMenu = {
     "END GAME", 
     "PADDLE WAR", 
     "QUIT"
-  }, 
-  {true, true, false, true, false, false, true, true}
+  },
+  {true, true, false, true, false, false, true, true},
+  {MODE_NEWGAME, MODE_LOADGAME, MODE_NONE, MODE_CONFIG, MODE_NONE, MODE_NONE, MODE_PADDLE, MODE_QUIT},
+  NULL,
+  8
 };
 
 void drawMenu(struct Menu menu) {
@@ -65,7 +85,7 @@ void drawMenu(struct Menu menu) {
   drawHeader(menu.title);
   u8g.setColorIndex(1);
   int i;
-  for (i=0; i< 8; i = i+1) {
+  for (i=0; i< menu.length; i = i+1) {
     drawMenuItem(i, menu.options[i], selected == i, menu.usable[i]);
   }
   u8g.setColorIndex(2);
@@ -124,6 +144,9 @@ void drawMenuItem(int index, char text[], boolean highlight, boolean usable) {
   }
 }
 
+void linkMenus(void) {
+  current_menu = mainMenu;
+}
 
 void setup(void) {
   //setup input pins
@@ -138,6 +161,7 @@ void setup(void) {
   u8g.setFont(keen);
   u8g.setColorIndex(2);
   redraw_required = 1;
+  linkMenus();
 }
 
 void checkInput(void) {
@@ -165,19 +189,33 @@ void processInput(void) {
   }
   last_key_code = uiKeyCode;
   
-  switch ( uiKeyCode ) {
-    case KEY_UP:
-      selected++;
-      if ( selected >= 8 )
-        selected = 0;
-      redraw_required = 1;
-      break;
-    case KEY_DOWN:
-      if ( selected == 0 )
-        selected = 8;
-      selected--;
-      redraw_required = 1;
-      break;
+  if (current_mode < 5) {
+    //Menu - up/down change selection
+    //left/right change menu/mode
+    switch ( uiKeyCode ) {
+      case KEY_UP:
+        selected++;
+        if ( selected >= current_menu.length )
+          selected = 0;
+        redraw_required = 1;
+        break;
+      case KEY_DOWN:
+        if ( selected == 0 )
+          selected = current_menu.length;
+        selected--;
+        redraw_required = 1;
+        break;
+      case KEY_LEFT:
+        //go back in current menu..
+        if (current_menu.back != NULL) {
+          //if we have somewhere to go back to...
+          current_menu = *current_menu.back;
+        
+        }
+        break;
+    }
+  
+  
   }
 }
 
