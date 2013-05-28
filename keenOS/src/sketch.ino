@@ -1,10 +1,21 @@
 //U8glib setup. include header file, and device definition.
-#include "U8glib.h"
+#include <U8glib.h>
+#include <KeenMenu.h>
 
+//fonts
 #include "fonts/keen.c"
 #include "fonts/keentitle.c"
-#include "display.h"
-#include "classes/menu.h"
+
+
+//defines for mode of display
+#define MODE_NONE -1
+#define MODE_SLEEP 0
+#define MODE_MAIN 1
+#define MODE_NEWGAME 2
+#define MODE_LOADGAME 3
+#define MODE_CONFIG 4
+#define MODE_PADDLE 5
+#define MODE_QUIT 6
 
 //defines for tracking keypresses
 #define KEY_NONE 0
@@ -12,6 +23,11 @@
 #define KEY_DOWN 2
 #define KEY_LEFT 3
 #define KEY_RIGHT 4
+
+//U8GLIB_DOGXL160_BW u8g(10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
+//U8GLIB_DOGXL160_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
+//U8GLIB_DOGXL160_2X_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
+U8GLIB_DOGXL160_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
 
 uint8_t current_mode;
 
@@ -32,17 +48,57 @@ const int right_pin = 8;
 
 int redraw_required = 0;
 
-Menu current_menu;
+Menu* current_menu;
 
-Menu mainMenu = Menu();
+Menu mainMenu;
+Menu newMenu;
 
+int selected = 0;
 
-void linkMenus(void) {
-  current_menu = mainMenu;
+void buildMainMenu() {
+  mainMenu.setTitle("MAIN MENU");
+  mainMenu.setBack(MODE_NONE);
+
+  mainMenu.addOption("NEW GAME", 1, MODE_NEWGAME);
+  mainMenu.addOption("LOAD GAME", 1, 0);
+  mainMenu.addOption("SAVE GAME", 0, 0);
+  mainMenu.addOption("CONFIGURE", 1, 0);
+  mainMenu.addOption("RETURN TO GAME", 0, 0);
+  mainMenu.addOption("END GAME", 0, 0);
+  mainMenu.addOption("PADDLE WAR", 1, 0);
+  mainMenu.addOption("QUIT", 1, 0);
+}
+
+void buildNewMenu() {
+  newMenu.setTitle("NEW GAME");
+  mainMenu.setBack(MODE_MAIN);
+
+  newMenu.addOption("EASY", 1, -1);
+  newMenu.addOption("NORMAL", 1, -1);
+  newMenu.addOption("HARD", 0, -1);
+}
+
+void getMenuByMode(int modeID) {
+  Serial.println(modeID);
+  switch (modeID) {
+    case MODE_MAIN:
+      current_menu = &mainMenu;
+      break;
+    case MODE_NEWGAME:
+      current_menu = &newMenu;
+      break;
+    default:
+      current_menu = &mainMenu;
+      break;
+  }
 }
 
 void setup(void) {
-  //setup input pins
+  Serial.begin(9600);
+  u8g.setFont(keen);
+  
+  buildMainMenu();  
+  buildNewMenu();
 
   //four buttons
   pinMode(up_pin, INPUT);
@@ -54,7 +110,9 @@ void setup(void) {
   u8g.setFont(keen);
   u8g.setColorIndex(2);
   redraw_required = 1;
-  linkMenus();
+  
+  current_menu = &mainMenu;
+  setFonts(keen, keentitle);
 }
 
 void checkInput(void) {
@@ -88,30 +146,37 @@ void processInput(void) {
     switch ( uiKeyCode ) {
       case KEY_UP:
         selected++;
-        if ( selected >= current_menu.getLength() )
+        if ( selected >= current_menu->getLength() )
           selected = 0;
         redraw_required = 1;
         break;
       case KEY_DOWN:
         if ( selected == 0 )
-          selected = current_menu.getLength();
+          selected = current_menu->getLength();
         selected--;
         redraw_required = 1;
         break;
       case KEY_LEFT:
         //go back in current menu..
-        //if (current_menu.back != NULL) {
+        if (current_menu->getBack() != MODE_NONE) {
           //if we have somewhere to go back to...
-        //  current_menu = *current_menu.back;
-        
-        //}
+          getMenuByMode(current_menu->getBack());
+          redraw_required = 1;
+        }
+        break;
+      case KEY_RIGHT:
+        //go forward in the current menu.
+        if (current_menu->getDestination(selected) != MODE_NONE) {
+          getMenuByMode(current_menu->getDestination(selected));
+          //current_menu = &newMenu;
+          redraw_required = 1;
+        }
         break;
     }
   
   
   }
 }
-
 
 void loop(void) {
   checkInput();
@@ -121,7 +186,7 @@ void loop(void) {
     u8g.firstPage();  
     do {
       
-      drawMenu(mainMenu);
+      current_menu->draw(u8g, selected);
     } while( u8g.nextPage() );
     redraw_required = 0;
   }
