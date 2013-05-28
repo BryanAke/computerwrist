@@ -29,13 +29,12 @@ void Menu::addOption(char* text, int u, int dest) {
 
 Menu::~Menu() {
   //nada here
-  this->length = 0;
-  
 }
 
 Menu::Menu() {
   //nada here
-  //title = "MAIN MENU";
+  length = 0;
+  xPos = 41;
 }
 
 void Menu::draw(U8GLIB_DOGXL160_2X_GR u8g, int selected) {
@@ -47,12 +46,13 @@ void Menu::draw(U8GLIB_DOGXL160_2X_GR u8g, int selected) {
   u8g.setColorIndex(1);
   u8g.setFont((const u8g_fntpgm_uint8_t*)menu_font);
 
-  char bffr[10];
-  u8g.drawStr(20, 20, itoa(selected, bffr, 10));
+  //char bffr[10];
+  //u8g.drawStr(20, 20, itoa(selected, bffr, 10));
   
   int i;
+  int width;
   for (i=0; i< length; i = i+1) {
-    drawMenuItem(u8g, i, options[i], selected == i, usable[i]);
+    drawMenuItem(u8g, xPos, i, options[i], selected == i, usable[i]);
   }
   u8g.setColorIndex(2);
 
@@ -61,13 +61,23 @@ void Menu::draw(U8GLIB_DOGXL160_2X_GR u8g, int selected) {
   u8g.setColorIndex(1);
   
   u8g.drawStr( 6, 93, "Arrows move      Enter selects");
-  u8g.drawStr( 51, 100, "ESC to quit");
+  if (back > 0) {
+    width = (160 - u8g.getStrWidth("ESC to back out")) / 2;
+    u8g.drawStr( width, 100, "ESC to back out");
+  } else {
+    width = (160 - u8g.getStrWidth("ESC to quit")) / 2;
+    u8g.drawStr( width, 100, "ESC to quit");
+  }
   u8g.setColorIndex(2);
 }
 
 
 void Menu::setBack(int back_mode) {
   back = back_mode;
+}
+
+void Menu::setXPos(int xpos) {
+  xPos = xpos;
 }
 
 
@@ -110,7 +120,7 @@ void drawHeader(U8GLIB_DOGXL160_2X_GR u8g, char title[]) {
 
 }
 
-void drawMenuItem(U8GLIB_DOGXL160_2X_GR u8g, int index, char text[], bool highlight, int usable) {
+void drawMenuItem(U8GLIB_DOGXL160_2X_GR u8g, int xPos, int index, char text[], bool highlight, int usable) {
   //draw the menu option with the given parameters..
   char* icon = "+";
   if (!usable) {
@@ -120,12 +130,12 @@ void drawMenuItem(U8GLIB_DOGXL160_2X_GR u8g, int index, char text[], bool highli
   if (highlight) {
     //up the brightness..
     u8g.setColorIndex(2);
-    u8g.drawStr(41, 20 + index*8, icon);
-    u8g.drawStr(46, 20 + index*8, text);
+    u8g.drawStr(xPos, 20 + index*8, icon);
+    u8g.drawStr(xPos + 5, 20 + index*8, text);
     u8g.setColorIndex(1);      
   } else {
-    u8g.drawStr(41, 20 + index*8, icon);
-    u8g.drawStr(46, 20 + index*8, text);
+    u8g.drawStr(xPos, 20 + index*8, icon);
+    u8g.drawStr(xPos + 5, 20 + index*8, text);
   }
 }
 

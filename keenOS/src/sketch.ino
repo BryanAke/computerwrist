@@ -52,6 +52,8 @@ Menu* current_menu;
 
 Menu mainMenu;
 Menu newMenu;
+Menu loadMenu;
+Menu configMenu;
 
 int selected = 0;
 
@@ -60,9 +62,9 @@ void buildMainMenu() {
   mainMenu.setBack(MODE_NONE);
 
   mainMenu.addOption("NEW GAME", 1, MODE_NEWGAME);
-  mainMenu.addOption("LOAD GAME", 1, 0);
+  mainMenu.addOption("LOAD GAME", 1, MODE_LOADGAME);
   mainMenu.addOption("SAVE GAME", 0, 0);
-  mainMenu.addOption("CONFIGURE", 1, 0);
+  mainMenu.addOption("CONFIGURE", 1, MODE_CONFIG);
   mainMenu.addOption("RETURN TO GAME", 0, 0);
   mainMenu.addOption("END GAME", 0, 0);
   mainMenu.addOption("PADDLE WAR", 1, 0);
@@ -71,11 +73,40 @@ void buildMainMenu() {
 
 void buildNewMenu() {
   newMenu.setTitle("NEW GAME");
-  mainMenu.setBack(MODE_MAIN);
+  newMenu.setBack(MODE_MAIN);
+  newMenu.setXPos(20);
 
-  newMenu.addOption("EASY", 1, -1);
-  newMenu.addOption("NORMAL", 1, -1);
-  newMenu.addOption("HARD", 0, -1);
+  newMenu.addOption("BEGIN EASY GAME", 0, -1);
+  newMenu.addOption("BEGIN NORMAL GAME", 0, -1);
+  newMenu.addOption("BEGIN HARD GAME", 0, -1);
+}
+
+void buildLoadMenu() {
+  loadMenu.setTitle("LOAD GAME");
+  loadMenu.setBack(MODE_MAIN);
+  loadMenu.setXPos(20);
+
+  loadMenu.addOption("Empty", 0, -1);
+  loadMenu.addOption("Empty", 0, -1);
+  loadMenu.addOption("Empty", 0, -1);
+  loadMenu.addOption("Empty", 0, -1);
+  loadMenu.addOption("Empty", 0, -1);
+  loadMenu.addOption("Empty", 0, -1);
+}
+
+void buildConfigMenu() {
+  configMenu.setTitle("CONFIGURE");
+  configMenu.setBack(MODE_MAIN);
+  configMenu.setXPos(20);
+
+  configMenu.addOption("SOUND", 1, -1);
+  configMenu.addOption("MUSIC", 0, -1);
+  configMenu.addOption("OPTIONS", 1, -1);
+  configMenu.addOption(" ", 0, -1);
+  configMenu.addOption("USE KEYBOARD", 1, -1);
+  configMenu.addOption("USE JOYSTICK #1", 0, -1);
+  configMenu.addOption("USE JOYSTICK #2", 0, -1);
+  configMenu.addOption("USE GRAVIS GAMEPAD (OFF)", 0, -1);
 }
 
 void getMenuByMode(int modeID) {
@@ -84,8 +115,14 @@ void getMenuByMode(int modeID) {
     case MODE_MAIN:
       current_menu = &mainMenu;
       break;
+    case MODE_LOADGAME:
+      current_menu = &loadMenu;
+      break;
     case MODE_NEWGAME:
       current_menu = &newMenu;
+      break;
+    case MODE_CONFIG:
+      current_menu = &configMenu;
       break;
     default:
       current_menu = &mainMenu;
@@ -99,6 +136,8 @@ void setup(void) {
   
   buildMainMenu();  
   buildNewMenu();
+  buildLoadMenu();
+  buildConfigMenu();
 
   //four buttons
   pinMode(up_pin, INPUT);
@@ -169,6 +208,7 @@ void processInput(void) {
         if (current_menu->getDestination(selected) != MODE_NONE) {
           getMenuByMode(current_menu->getDestination(selected));
           //current_menu = &newMenu;
+          selected = 0;
           redraw_required = 1;
         }
         break;
