@@ -18,6 +18,7 @@ class Menu
     void setTitle(char* title_str);
     void setBack(int back_mode);
     void setXPos(int xpos);
+    void setSpacePos(int pos);
 
     //getters
     int getLength();
@@ -33,11 +34,12 @@ class Menu
     int back;
 
     int xPos;
+    int spacePos;
 };
 
 #endif
 
-void drawMenuItem(U8GLIB_DOGXL160_2X_GR u8g, int xPos, int index, char text[], bool highlight, int usable);
+void drawMenuItem(U8GLIB_DOGXL160_2X_GR u8g, int xPos, int yPos, char text[], bool highlight, int usable);
 void drawHeader(U8GLIB_DOGXL160_2X_GR u8g, char title[]);
 
 void setFonts(const void* menu_fnt, const void* title_fnt);

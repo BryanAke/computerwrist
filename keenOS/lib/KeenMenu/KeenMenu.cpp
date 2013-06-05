@@ -6,7 +6,7 @@
 const void *menu_font; 
 const void *title_font; 
 
-Menu::Menu(char* t) : title(), options(), usable(), destination() {
+Menu::Menu(char* t) : title(), options(), usable(), destination(), spacePos() {
   this->length = 0;
   //strcpy(this->title, t);
 
@@ -14,7 +14,6 @@ Menu::Menu(char* t) : title(), options(), usable(), destination() {
 
 void Menu::setTitle(char* title_str) {
   strncpy(title, title_str, 20);
-  //title = "MAIN M";
 }
 
 void Menu::addOption(char* text, int u, int dest) {
@@ -35,6 +34,7 @@ Menu::Menu() {
   //nada here
   length = 0;
   xPos = 41;
+  spacePos = 0;
 }
 
 void Menu::draw(U8GLIB_DOGXL160_2X_GR u8g, int selected) {
@@ -51,8 +51,21 @@ void Menu::draw(U8GLIB_DOGXL160_2X_GR u8g, int selected) {
   
   int i;
   int width;
+
+  //position the top of the list based on whether there's a space in the middle of it.
+  int yZero = 20;
+  if (spacePos != 0) {
+    yZero = 17;
+  }
+
   for (i=0; i< length; i = i+1) {
-    drawMenuItem(u8g, xPos, i, options[i], selected == i, usable[i]);
+    int yPos = yZero + i*8;
+    if (spacePos && i > spacePos) {
+      yPos = yZero + (i+1)*8;
+    }
+
+    drawMenuItem(u8g, xPos, yPos, options[i], selected == i, usable[i]);
+
   }
   u8g.setColorIndex(2);
 
@@ -80,6 +93,9 @@ void Menu::setXPos(int xpos) {
   xPos = xpos;
 }
 
+void Menu::setSpacePos(int pos) {
+  spacePos = pos;
+}
 
 int Menu::getLength() {
   return length;
@@ -120,22 +136,31 @@ void drawHeader(U8GLIB_DOGXL160_2X_GR u8g, char title[]) {
 
 }
 
-void drawMenuItem(U8GLIB_DOGXL160_2X_GR u8g, int xPos, int index, char text[], bool highlight, int usable) {
+void drawMenuItem(U8GLIB_DOGXL160_2X_GR u8g, int xPos, int yPos, char text[], bool highlight, int usable) {
   //draw the menu option with the given parameters..
   char* icon = "+";
-  if (!usable) {
-    icon = "-";
-  }
+  switch (usable) {
 
-  if (highlight) {
-    //up the brightness..
-    u8g.setColorIndex(2);
-    u8g.drawStr(xPos, 20 + index*8, icon);
-    u8g.drawStr(xPos + 5, 20 + index*8, text);
-    u8g.setColorIndex(1);      
-  } else {
-    u8g.drawStr(xPos, 20 + index*8, icon);
-    u8g.drawStr(xPos + 5, 20 + index*8, text);
+    case 2:
+      xPos = (u8g.getWidth() - u8g.getStrWidth(text)) / 2;
+      u8g.drawStr(xPos, yPos, text);
+      break;
+
+    case 0:
+      icon = "-";
+      
+    default:
+      if (highlight) {
+        //up the brightness..
+        u8g.setColorIndex(2);
+        u8g.drawStr(xPos, yPos, icon);
+        u8g.drawStr(xPos + 5, yPos, text);
+        u8g.setColorIndex(1);      
+      } else {
+        u8g.drawStr(xPos, yPos, icon);
+        u8g.drawStr(xPos + 5, yPos, text);
+      }
+      break;
   }
 }
 

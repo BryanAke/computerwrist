@@ -97,16 +97,17 @@ void buildLoadMenu() {
 void buildConfigMenu() {
   configMenu.setTitle("CONFIGURE");
   configMenu.setBack(MODE_MAIN);
-  configMenu.setXPos(20);
+  configMenu.setXPos(10);
+  configMenu.setSpacePos(2);
 
   configMenu.addOption("SOUND", 1, -1);
   configMenu.addOption("MUSIC", 0, -1);
   configMenu.addOption("OPTIONS", 1, -1);
-  configMenu.addOption(" ", 0, -1);
   configMenu.addOption("USE KEYBOARD", 1, -1);
   configMenu.addOption("USE JOYSTICK #1", 0, -1);
   configMenu.addOption("USE JOYSTICK #2", 0, -1);
   configMenu.addOption("USE GRAVIS GAMEPAD (OFF)", 0, -1);
+  configMenu.addOption("CONTROL: KEYBOARD", 2, -1);
 }
 
 void getMenuByMode(int modeID) {
@@ -184,16 +185,16 @@ void processInput(void) {
     //left/right change menu/mode
     switch ( uiKeyCode ) {
       case KEY_UP:
-        selected++;
-        if ( selected >= current_menu->getLength() )
-          selected = 0;
-        redraw_required = 1;
+        if (selected < current_menu->getLength() -1) {
+          selected++;
+          redraw_required = 1;
+        }
         break;
       case KEY_DOWN:
-        if ( selected == 0 )
-          selected = current_menu->getLength();
-        selected--;
-        redraw_required = 1;
+        if ( selected != 0 ) {
+          selected--;
+          redraw_required = 1;
+        }
         break;
       case KEY_LEFT:
         //go back in current menu..
