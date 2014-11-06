@@ -1,0 +1,260 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:special
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:dogxl
+LIBS:general
+LIBS:computerwist-main-cache
+EELAYER 27 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 2 2
+Title ""
+Date "9 feb 2014"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text HLabel 1250 1950 0    60   Input ~ 0
+VBus
+Text HLabel 1250 2350 0    60   Input ~ 0
+GND
+Text HLabel 5050 1750 2    60   Input ~ 0
+V+
+$Comp
+L CONN_2 P?
+U 1 1 51E20C67
+P 5200 2050
+F 0 "P?" V 5150 2050 40  0000 C CNN
+F 1 "LiPo" V 5250 2050 40  0000 C CNN
+F 2 "" H 5200 2050 60  0000 C CNN
+F 3 "" H 5200 2050 60  0000 C CNN
+	1    5200 2050
+	1    0    0    -1  
+$EndComp
+$Comp
+L MCP73831 U?
+U 1 1 51E214B2
+P 3300 2050
+F 0 "U?" H 3050 2250 60  0000 C CNN
+F 1 "MCP73831" H 3250 1850 60  0000 C CNN
+F 2 "" H 3300 2050 60  0000 C CNN
+F 3 "" H 3300 2050 60  0000 C CNN
+	1    3300 2050
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 51E214CA
+P 1350 2550
+F 0 "#PWR?" H 1350 2550 30  0001 C CNN
+F 1 "GND" H 1350 2480 30  0001 C CNN
+F 2 "" H 1350 2550 60  0000 C CNN
+F 3 "" H 1350 2550 60  0000 C CNN
+	1    1350 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 51E214D9
+P 1600 2550
+F 0 "#PWR?" H 1600 2550 30  0001 C CNN
+F 1 "GND" H 1600 2480 30  0001 C CNN
+F 2 "" H 1600 2550 60  0000 C CNN
+F 3 "" H 1600 2550 60  0000 C CNN
+	1    1600 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C?
+U 1 1 51E21542
+P 1600 2250
+F 0 "C?" H 1600 2350 40  0000 L CNN
+F 1 "4.7uF" H 1606 2165 40  0000 L CNN
+F 2 "~" H 1638 2100 30  0000 C CNN
+F 3 "~" H 1600 2250 60  0000 C CNN
+	1    1600 2250
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D?
+U 1 1 51E21576
+P 2450 2150
+F 0 "D?" H 2450 2250 50  0000 C CNN
+F 1 "RED" H 2450 2050 50  0000 C CNN
+F 2 "~" H 2450 2150 60  0000 C CNN
+F 3 "~" H 2450 2150 60  0000 C CNN
+	1    2450 2150
+	0    -1   1    0   
+$EndComp
+$Comp
+L R R?
+U 1 1 51E21599
+P 2750 2450
+F 0 "R?" V 2830 2450 40  0000 C CNN
+F 1 "330" V 2757 2451 40  0000 C CNN
+F 2 "~" V 2680 2450 30  0000 C CNN
+F 3 "~" H 2750 2450 30  0000 C CNN
+	1    2750 2450
+	-1   0    0    1   
+$EndComp
+$Comp
+L LED D?
+U 1 1 51E216C9
+P 2150 2150
+F 0 "D?" H 2150 2250 50  0000 C CNN
+F 1 "DNP" H 2150 2050 50  0000 C CNN
+F 2 "~" H 2150 2150 60  0000 C CNN
+F 3 "~" H 2150 2150 60  0000 C CNN
+	1    2150 2150
+	0    -1   1    0   
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 51E21730
+P 3900 2500
+F 0 "#PWR?" H 3900 2500 30  0001 C CNN
+F 1 "GND" H 3900 2430 30  0001 C CNN
+F 2 "" H 3900 2500 60  0000 C CNN
+F 3 "" H 3900 2500 60  0000 C CNN
+	1    3900 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 51E21766
+P 4050 2800
+F 0 "#PWR?" H 4050 2800 30  0001 C CNN
+F 1 "GND" H 4050 2730 30  0001 C CNN
+F 2 "" H 4050 2800 60  0000 C CNN
+F 3 "" H 4050 2800 60  0000 C CNN
+	1    4050 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R?
+U 1 1 51E21776
+P 4050 2400
+F 0 "R?" V 4130 2400 40  0000 C CNN
+F 1 "2k" V 4057 2401 40  0000 C CNN
+F 2 "~" V 3980 2400 30  0000 C CNN
+F 3 "~" H 4050 2400 30  0000 C CNN
+	1    4050 2400
+	-1   0    0    1   
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 51E21800
+P 4200 2500
+F 0 "#PWR?" H 4200 2500 30  0001 C CNN
+F 1 "GND" H 4200 2430 30  0001 C CNN
+F 2 "" H 4200 2500 60  0000 C CNN
+F 3 "" H 4200 2500 60  0000 C CNN
+	1    4200 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C?
+U 1 1 51E21809
+P 4200 2250
+F 0 "C?" H 4200 2350 40  0000 L CNN
+F 1 "4.7uF" H 4206 2165 40  0000 L CNN
+F 2 "~" H 4238 2100 30  0000 C CNN
+F 3 "~" H 4200 2250 60  0000 C CNN
+	1    4200 2250
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 51E2185A
+P 4700 2500
+F 0 "#PWR?" H 4700 2500 30  0001 C CNN
+F 1 "GND" H 4700 2430 30  0001 C CNN
+F 2 "" H 4700 2500 60  0000 C CNN
+F 3 "" H 4700 2500 60  0000 C CNN
+	1    4700 2500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1250 1950 2850 1950
+Wire Wire Line
+	1250 2350 1350 2350
+Wire Wire Line
+	1350 2350 1350 2550
+Wire Wire Line
+	1600 1950 1600 2050
+Connection ~ 2150 1950
+Wire Wire Line
+	1600 2450 1600 2550
+Wire Wire Line
+	2450 2350 2450 2750
+Connection ~ 1600 1950
+Wire Wire Line
+	2150 2350 2150 2750
+Connection ~ 2450 2750
+Connection ~ 2450 1950
+Wire Wire Line
+	3750 2150 3900 2150
+Wire Wire Line
+	3900 2150 3900 2500
+Wire Wire Line
+	4050 2050 4050 2150
+Wire Wire Line
+	4050 2650 4050 2800
+Wire Wire Line
+	4050 2050 3750 2050
+Wire Wire Line
+	3750 1950 4850 1950
+Wire Wire Line
+	4200 1950 4200 2050
+Wire Wire Line
+	4200 2450 4200 2500
+Wire Wire Line
+	4850 1950 4850 1750
+Connection ~ 4200 1950
+Wire Wire Line
+	4850 2150 4700 2150
+Wire Wire Line
+	4700 2150 4700 2500
+Wire Wire Line
+	2850 2150 2750 2150
+Wire Wire Line
+	2150 2750 2750 2750
+Wire Wire Line
+	2750 2150 2750 2200
+Wire Wire Line
+	2750 2750 2750 2700
+Wire Wire Line
+	4850 1750 5050 1750
+$EndSCHEMATC
