@@ -1,6 +1,7 @@
 //U8glib setup. include header file, and device definition.
 #include <U8glib.h>
 #include <KeenMenu.h>
+#include <PaddleWar.h>
 
 //fonts
 #include "fonts/keen.c"
@@ -55,6 +56,8 @@ Menu newMenu;
 Menu loadMenu;
 Menu configMenu;
 
+PaddleWar paddleWar;
+
 int selected = 0;
 
 void buildMainMenu() {
@@ -67,7 +70,7 @@ void buildMainMenu() {
   mainMenu.addOption("CONFIGURE", 1, MODE_CONFIG);
   mainMenu.addOption("RETURN TO GAME", 0, 0);
   mainMenu.addOption("END GAME", 0, 0);
-  mainMenu.addOption("PADDLE WAR", 1, 0);
+  mainMenu.addOption("PADDLE WAR", 1, MODE_PADDLE);
   mainMenu.addOption("QUIT", 1, 0);
 }
 
@@ -111,7 +114,7 @@ void buildConfigMenu() {
 }
 
 void getMenuByMode(int modeID) {
-  Serial.println(modeID);
+  //Serial.println(modeID);
   switch (modeID) {
     case MODE_MAIN:
       current_menu = &mainMenu;
@@ -180,6 +183,8 @@ void processInput(void) {
   }
   last_key_code = uiKeyCode;
   
+  int nextMode = MODE_NONE;
+  
   if (current_mode < 5) {
     //Menu - up/down change selection
     //left/right change menu/mode
@@ -198,19 +203,38 @@ void processInput(void) {
         break;
       case KEY_LEFT:
         //go back in current menu..
-        if (current_menu->getBack() != MODE_NONE) {
+        if (current_mode < MODE_PADDLE) {
+          nextMode = current_menu->getBack();
+        
+        } else {
+          nextMode = MODE_MAIN;
+        }
+        if (nextMode != MODE_NONE) {
           //if we have somewhere to go back to...
-          getMenuByMode(current_menu->getBack());
+          current_mode = nextMode;
+          
+          getMenuByMode(nextMode);
           redraw_required = 1;
         }
         break;
       case KEY_RIGHT:
         //go forward in the current menu.
-        if (current_menu->getDestination(selected) != MODE_NONE) {
+        nextMode = current_menu->getDestination(selected);
+        
+        if (nextMode != MODE_NONE && nextMode < MODE_PADDLE) {
+          //next mode is a menu
+          current_mode = nextMode;
           getMenuByMode(current_menu->getDestination(selected));
-          //current_menu = &newMenu;
+          
           selected = 0;
           redraw_required = 1;
+        } else if(nextMode == MODE_PADDLE) {
+          current_mode = nextMode;
+          redraw_required = 1;
+          
+        } else if(nextMode == MODE_QUIT) {
+          //current_mode = nextMode;
+        
         }
         break;
     }
@@ -224,10 +248,17 @@ void loop(void) {
   processInput();
   if (  redraw_required != 0 ) {
     // picture loop
-    u8g.firstPage();  
+    u8g.firstPage(); 
     do {
-      
-      current_menu->draw(u8g, selected);
+      if (current_mode < MODE_PADDLE) {
+        current_menu->draw(u8g, selected);
+      }
+      else if (current_mode == MODE_PADDLE) {
+        (&paddleWar)->draw(u8g);
+      }
+      else if (current_mode == MODE_QUIT) {
+        
+      }
     } while( u8g.nextPage() );
     redraw_required = 0;
   }
