@@ -13,6 +13,7 @@ class PaddleWar
     
     //Drawing methods:
     void draw(U8GLIB_DOGXL160_2X_GR u8g);
+    void drawHeader(U8GLIB_DOGXL160_2X_GR u8g);
     void drawBall(U8GLIB_DOGXL160_2X_GR u8g);
     void drawPaddles(U8GLIB_DOGXL160_2X_GR u8g);
     
@@ -28,7 +29,11 @@ class PaddleWar
     
     int ballX;
     int ballY;
+    
+    int ballDirX;
+    int ballDirY;
 };
 
+void setFontsPW(const void* menu_fnt);
 #endif/stop
 

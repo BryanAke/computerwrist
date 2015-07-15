@@ -40,8 +40,8 @@ uint8_t last_key_code = KEY_NONE;
 
 //set up pins for buttons.
 //up/down -- flat buttons in middle of left side
-const int up_pin = 6;
-const int down_pin = 5;
+const int up_pin = 5;
+const int down_pin = 6;
 
 //left/right -- round buttons on bottom-left corner.
 const int left_pin = 7;
@@ -156,6 +156,7 @@ void setup(void) {
   
   current_menu = &mainMenu;
   setFonts(keen, keentitle);
+  setFontsPW(keen);
 }
 
 void checkInput(void) {
@@ -260,7 +261,9 @@ void loop(void) {
         
       }
     } while( u8g.nextPage() );
-    redraw_required = 0;
+    if (current_mode != MODE_PADDLE) {
+        redraw_required = 0;
+    }
   }
   
   // rebuild the picture after some delay
