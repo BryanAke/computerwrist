@@ -77,13 +77,13 @@ void PaddleWar::tick(uint8_t key) {
   }
     
   //computer AI
-  if (ballX > cPos + 5 && cPos <= 148) {
+  if (ballX > cPos && cPos <= 148) {
     cPos += 2;
     if (cPos > 148) {
       cPos = 148;
     }
   }
-  else if (ballX < cPos - 5 && cPos >= 0) {
+  else if (ballX < cPos && cPos >= 0) {
     cPos -= 2;
     if (cPos < 0) {
       cPos = 0;
