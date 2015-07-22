@@ -25,9 +25,6 @@
 #define KEY_LEFT 3
 #define KEY_RIGHT 4
 
-//U8GLIB_DOGXL160_BW u8g(10, 9);		// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
-//U8GLIB_DOGXL160_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
-//U8GLIB_DOGXL160_2X_BW u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
 U8GLIB_DOGXL160_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
 
 uint8_t current_mode;
@@ -154,6 +151,7 @@ void setup(void) {
   u8g.setColorIndex(2);
   redraw_required = 1;
   
+  current_mode = MODE_PADDLE;
   current_menu = &mainMenu;
   setFonts(keen, keentitle);
   setFontsPW(keen);
@@ -244,28 +242,45 @@ void processInput(void) {
   }
 }
 
+unsigned long lastTickMillis = 0;
+unsigned long currentMillis = 0;
+char tstr[10];
+
 void loop(void) {
   checkInput();
-  processInput();
-  if (  redraw_required != 0 ) {
-    // picture loop
-    u8g.firstPage(); 
-    do {
-      if (current_mode < MODE_PADDLE) {
-        current_menu->draw(u8g, selected);
-      }
-      else if (current_mode == MODE_PADDLE) {
+  if (current_mode == MODE_PADDLE) {
+    //PADDLEWAR!
+    if (  redraw_required != 0 ) {
+      u8g.firstPage(); 
+      do {
         (&paddleWar)->draw(u8g);
-      }
-      else if (current_mode == MODE_QUIT) {
-        
-      }
-    } while( u8g.nextPage() );
-    if (current_mode != MODE_PADDLE) {
-        redraw_required = 0;
+      
+      } while( u8g.nextPage() );
+      redraw_required = 0;
+    }
+    currentMillis = millis();
+    if (currentMillis - lastTickMillis > 25) {
+      
+      //longer than 50 ms since last tick, so tick.
+      lastTickMillis = currentMillis;
+      (&paddleWar)->tick(uiKeyCode);
+      redraw_required = 1;
     }
   }
-  
-  // rebuild the picture after some delay
-  //delay(100);
+  else {
+    processInput();
+    //everything else
+    if (  redraw_required != 0 ) {
+      u8g.firstPage(); 
+      do {
+        if (current_mode != MODE_QUIT) {
+          current_menu->draw(u8g, selected);
+        }
+        else {
+          //pass
+        }
+      } while( u8g.nextPage() );
+      redraw_required = 0;
+    }
+  }
 }

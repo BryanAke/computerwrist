@@ -17,6 +17,9 @@ class PaddleWar
     void drawBall(U8GLIB_DOGXL160_2X_GR u8g);
     void drawPaddles(U8GLIB_DOGXL160_2X_GR u8g);
     
+    //tick update
+    void tick(uint8_t key);
+    
     //getters and setters
 
   private:

@@ -5,6 +5,21 @@
 
 const void *score_fnt;
 
+//defines for tracking keypresses
+#define KEY_NONE 0
+#define KEY_UP 1
+#define KEY_DOWN 2
+#define KEY_LEFT 3
+#define KEY_RIGHT 4
+    
+//playfield area!
+#define XMIN 0
+#define XMAX 155
+#define YMIN 12
+#define YMIN_P 20
+#define YMAX_P 82
+#define YMAX 95
+
 #define paddlewar_logo_width 37
 #define paddlewar_logo_height 8
 static unsigned char paddlewar_logo_bits[] U8G_PROGMEM = {
@@ -23,8 +38,57 @@ PaddleWar::PaddleWar() {
   ballX = 40;
   ballY = 40;
   
-  ballDirX = 1;
-  ballDirY = 1;
+  ballDirX = 2;
+  ballDirY = 2;
+}
+
+void PaddleWar::tick(uint8_t key) {
+    
+  //ball movement
+  if (ballY >= YMAX_P) {
+    ballDirY = -2;
+  }
+  else if(ballY <= YMIN_P) {
+    ballDirY = 2;
+  }
+  ballY += ballDirY;
+    
+  if (ballX >= XMAX) {
+    ballDirX = -2;
+  }
+  else if(ballX <= XMIN) {
+    ballDirX = 2;
+  }
+  ballX += ballDirX;
+  
+    
+  //player paddle movement
+  if(key == KEY_RIGHT && cPos <= 148) {
+    pPos += 3; 
+    if (pPos > 148) {
+      pPos = 148;
+    }
+  }
+  else if(key == KEY_LEFT && cPos >= 0) {
+    pPos -= 3;
+    if (pPos < 0) {
+      pPos = 0;
+    }
+  }
+    
+  //computer AI
+  if (ballX > cPos + 5 && cPos <= 148) {
+    cPos += 2;
+    if (cPos > 148) {
+      cPos = 148;
+    }
+  }
+  else if (ballX < cPos - 5 && cPos >= 0) {
+    cPos -= 2;
+    if (cPos < 0) {
+      cPos = 0;
+    }
+  }
 }
 
 void PaddleWar::draw(U8GLIB_DOGXL160_2X_GR u8g) {
@@ -46,8 +110,8 @@ void PaddleWar::drawHeader(U8GLIB_DOGXL160_2X_GR u8g) {
   u8g.drawStr( 8, 8, "KEEN:0");
   u8g.drawStr( 110, 8, "COMP:0");
 
-  u8g.drawHLine(3,11, u8g.getWidth() - 6);
-  u8g.drawHLine(3,100, u8g.getWidth() - 6);
+  u8g.drawHLine(3, YMIN, u8g.getWidth() - 6);
+  u8g.drawHLine(3, YMAX, u8g.getWidth() - 6);
 }
 
 void PaddleWar::drawBall(U8GLIB_DOGXL160_2X_GR u8g) {
@@ -59,18 +123,6 @@ void PaddleWar::drawBall(U8GLIB_DOGXL160_2X_GR u8g) {
   u8g.drawPixel(ballX + 4, ballY);
   u8g.drawPixel(ballX, ballY + 4);
   u8g.drawPixel(ballX + 4, ballY + 4);
-  
-  /*
-  ballX += ballDirX;
-  
-  if(ballX > 60) {
-    ballDirX = -1;
-  }
-  
-  if(ballX < 30) {
-    ballDirX = 1;
-  }
-  */
 }
 
 void PaddleWar::drawPaddles(U8GLIB_DOGXL160_2X_GR u8g) {
