@@ -1,4 +1,6 @@
 .build
+.pioenvs
+.sconsign.dblite
 
 #temp files
 *~
