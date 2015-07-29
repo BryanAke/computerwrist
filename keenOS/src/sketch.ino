@@ -1,5 +1,6 @@
 //U8glib setup. include header file, and device definition.
-#include <U8glib.h>
+#include <SPI.h>
+#include <u8g_teensy.h>
 #include <KeenMenu.h>
 #include <PaddleWar.h>
 
@@ -259,7 +260,7 @@ void loop(void) {
       redraw_required = 0;
     }
     currentMillis = millis();
-    if (currentMillis - lastTickMillis > 25) {
+    if (currentMillis - lastTickMillis > 30) {
       
       //longer than 50 ms since last tick, so tick.
       lastTickMillis = currentMillis;

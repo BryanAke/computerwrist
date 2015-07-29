@@ -142,6 +142,7 @@ void u8g_10MicroDelay(void)
 
 /*== Arduino Delay ==*/
 #if defined(USE_ARDUINO_DELAY)
+#include "Arduino.h"
 void u8g_Delay(uint16_t val)
 {
 	delay(val);

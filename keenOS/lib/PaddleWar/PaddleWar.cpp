@@ -1,7 +1,7 @@
 #include "PaddleWar.h"
 
 #include "Arduino.h"
-#include "U8glib.h"
+#include "u8g_teensy.h"
 
 const void *score_fnt;
 

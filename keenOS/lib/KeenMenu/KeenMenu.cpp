@@ -1,7 +1,7 @@
 #include "KeenMenu.h"
 
 #include "Arduino.h"
-#include "U8glib.h"
+#include "u8g_teensy.h"
 
 const void *menu_font; 
 const void *title_font; 
