@@ -1,6 +1,6 @@
 //U8glib setup. include header file, and device definition.
 #include <SPI.h>
-#include <u8g_teensy.h>
+#include "U8glib.h"
 #include <KeenMenu.h>
 #include <PaddleWar.h>
 
@@ -26,7 +26,8 @@
 #define KEY_LEFT 3
 #define KEY_RIGHT 4
 
-U8GLIB_DOGXL160_2X_GR u8g(13, 11, 10, 9);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
+//U8GLIB u8g(&u8g_dev_uc1610_dogxl160_2x_gr_hw_spi, u8g_com_hw_spi_fn);
+U8GLIB_DOGXL160_2X_GR u8g(10, 12);	// SPI Com: SCK = 13, MOSI = 11, CS = 10, A0 = 9
 
 uint8_t current_mode;
 
@@ -133,7 +134,9 @@ void getMenuByMode(int modeID) {
 }
 
 void setup(void) {
-  Serial.begin(9600);
+  //Serial.begin(9600);
+  
+  pinMode(10, OUTPUT);
   u8g.setFont(keen);
   
   buildMainMenu();  
@@ -142,10 +145,10 @@ void setup(void) {
   buildConfigMenu();
 
   //four buttons
-  pinMode(up_pin, INPUT);
-  pinMode(down_pin, INPUT);
-  pinMode(left_pin, INPUT);
-  pinMode(right_pin, INPUT);
+  //pinMode(up_pin, INPUT);
+  //pinMode(down_pin, INPUT);
+  //pinMode(left_pin, INPUT);
+  //pinMode(right_pin, INPUT);
 
   //set font to default font
   u8g.setFont(keen);
@@ -260,7 +263,7 @@ void loop(void) {
       redraw_required = 0;
     }
     currentMillis = millis();
-    if (currentMillis - lastTickMillis > 30) {
+    if (currentMillis - lastTickMillis > 50) {
       
       //longer than 50 ms since last tick, so tick.
       lastTickMillis = currentMillis;

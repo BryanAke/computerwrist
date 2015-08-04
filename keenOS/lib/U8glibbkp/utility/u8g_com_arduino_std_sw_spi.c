@@ -1,6 +1,6 @@
 /*
   
-  u8g_com_arduino_hw_spi.c
+  u8g_arduino_std_sw_spi.c
 
   Universal 8bit Graphics Library
   
@@ -31,101 +31,59 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
   
-
 */
 
 #include "u8g.h"
 
+
 #if defined(ARDUINO)
 
-#if defined(__AVR__)
-
-#include <avr/interrupt.h>
-#include <avr/io.h>
-
 #if ARDUINO < 100 
-#include <WProgram.h> 
-
-/* fixed pins */
-#if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284P__) // Sanguino.cc board
-#define PIN_SCK         7
-#define PIN_MISO        6
-#define PIN_MOSI        5
-#define PIN_CS          4
-#else                                   // Arduino Board
-#define PIN_SCK 13
-#define PIN_MISO  12
-#define PIN_MOSI 11
-#define PIN_CS 10
-#endif // (__AVR_ATmega644P__) || defined(__AVR_ATmega1284P__)
-
+#include <WProgram.h>
 #else 
-
 #include <Arduino.h> 
-
-/* use Arduino pin definitions */
-#define PIN_SCK SCK
-#define PIN_MISO  MISO
-#define PIN_MOSI MOSI
-#define PIN_CS SS
-
 #endif
 
-
-
-//static uint8_t u8g_spi_out(uint8_t data) U8G_NOINLINE;
-static uint8_t u8g_spi_out(uint8_t data)
+void u8g_arduino_sw_spi_shift_out(uint8_t dataPin, uint8_t clockPin, uint8_t val)
 {
-  /* unsigned char x = 100; */
-  /* send data */
-  SPDR = data;
-  /* wait for transmission */
-  while (!(SPSR & (1<<SPIF))) 
-    ;
-  /* clear the SPIF flag by reading SPDR */
-  return  SPDR;
+  uint8_t i = 8;
+  do
+  {
+    if ( val & 128 )
+      digitalWrite(dataPin, HIGH);
+    else
+      digitalWrite(dataPin, LOW);
+    val <<= 1;
+    u8g_MicroDelay();		/* 23 Sep 2012 */
+    //delay(1);
+    digitalWrite(clockPin, HIGH);
+    u8g_MicroDelay();		/* 23 Sep 2012 */
+    //delay(1);
+    digitalWrite(clockPin, LOW);		
+    u8g_MicroDelay();		/* 23 Sep 2012 */
+    //delay(1);
+    i--;
+  } while( i != 0 );
 }
 
-
-uint8_t u8g_com_arduino_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
+uint8_t u8g_com_arduino_std_sw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
 {
   switch(msg)
   {
-    case U8G_COM_MSG_STOP:
-      break;
-    
     case U8G_COM_MSG_INIT:
       u8g_com_arduino_assign_pin_output_high(u8g);
-      pinMode(PIN_SCK, OUTPUT);
-      digitalWrite(PIN_SCK, LOW);
-      pinMode(PIN_MOSI, OUTPUT);
-      digitalWrite(PIN_MOSI, LOW);
-      /* pinMode(PIN_MISO, INPUT); */
-
-      pinMode(PIN_CS, OUTPUT);			/* system chip select for the atmega board */
-      digitalWrite(PIN_CS, HIGH);
+      u8g_com_arduino_digital_write(u8g, U8G_PI_SCK, LOW);
+      u8g_com_arduino_digital_write(u8g, U8G_PI_MOSI, LOW);
+      break;
     
+    case U8G_COM_MSG_STOP:
+      break;
 
-
-      /*
-        SPR1 SPR0
-            0	0		fclk/4
-            0	1		fclk/16
-            1	0		fclk/64
-            1	1		fclk/128
-      */
-      SPCR = 0;
-      SPCR =  (1<<SPE) | (1<<MSTR)|(0<<SPR1)|(0<<SPR0)|(0<<CPOL)|(0<<CPHA);
-#ifdef U8G_HW_SPI_2X
-      SPSR = (1 << SPI2X);  /* double speed, issue 89 */
-#endif
+    case U8G_COM_MSG_RESET:
+      if ( u8g->pin_list[U8G_PI_RESET] != U8G_PIN_NONE )
+        u8g_com_arduino_digital_write(u8g, U8G_PI_RESET, arg_val);
+      break;
       
-      break;
-    
-    case U8G_COM_MSG_ADDRESS:                     /* define cmd (arg_val = 0) or data mode (arg_val = 1) */
-      u8g_com_arduino_digital_write(u8g, U8G_PI_A0, arg_val);
-      break;
-
     case U8G_COM_MSG_CHIP_SELECT:
       if ( arg_val == 0 )
       {
@@ -139,14 +97,9 @@ uint8_t u8g_com_arduino_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void
         u8g_com_arduino_digital_write(u8g, U8G_PI_CS, LOW);
       }
       break;
-      
-    case U8G_COM_MSG_RESET:
-      if ( u8g->pin_list[U8G_PI_RESET] != U8G_PIN_NONE )
-        u8g_com_arduino_digital_write(u8g, U8G_PI_RESET, arg_val);
-      break;
-    
+
     case U8G_COM_MSG_WRITE_BYTE:
-      u8g_spi_out(arg_val);
+      u8g_arduino_sw_spi_shift_out(u8g->pin_list[U8G_PI_MOSI], u8g->pin_list[U8G_PI_SCK], arg_val);
       break;
     
     case U8G_COM_MSG_WRITE_SEQ:
@@ -154,35 +107,34 @@ uint8_t u8g_com_arduino_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void
         register uint8_t *ptr = arg_ptr;
         while( arg_val > 0 )
         {
-          u8g_spi_out(*ptr++);
+          u8g_arduino_sw_spi_shift_out(u8g->pin_list[U8G_PI_MOSI], u8g->pin_list[U8G_PI_SCK], *ptr++);
           arg_val--;
         }
       }
       break;
-    case U8G_COM_MSG_WRITE_SEQ_P:
+
+      case U8G_COM_MSG_WRITE_SEQ_P:
       {
         register uint8_t *ptr = arg_ptr;
         while( arg_val > 0 )
         {
-          u8g_spi_out(u8g_pgm_read(ptr));
+          u8g_arduino_sw_spi_shift_out(u8g->pin_list[U8G_PI_MOSI], u8g->pin_list[U8G_PI_SCK], u8g_pgm_read(ptr));
           ptr++;
           arg_val--;
         }
       }
       break;
+      
+    case U8G_COM_MSG_ADDRESS:                     /* define cmd (arg_val = 0) or data mode (arg_val = 1) */
+      u8g_com_arduino_digital_write(u8g, U8G_PI_A0, arg_val);
+      break;
   }
   return 1;
 }
 
-/* #elif defined(__18CXX) || defined(__PIC32MX) */
-
-#else /* __AVR__ */
-
-#endif /* __AVR__ */
-
 #else /* ARDUINO */
 
-uint8_t u8g_com_arduino_hw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
+uint8_t u8g_com_arduino_std_sw_spi_fn(u8g_t *u8g, uint8_t msg, uint8_t arg_val, void *arg_ptr)
 {
   return 1;
 }

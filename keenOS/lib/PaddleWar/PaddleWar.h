@@ -2,8 +2,8 @@
 #define PADDLE_H
 
 #include "Arduino.h"
+#include <SPI.h>
 #include "U8glib.h"
-#include "u8g.h"
 
 class PaddleWar 
 {
